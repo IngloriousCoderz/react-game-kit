@@ -1,6 +1,6 @@
 /* globals __dirname */
-const webpack = require('webpack');
-const path = require('path');
+const webpack = require('webpack')
+const path = require('path')
 
 module.exports = {
   entry: path.join(__dirname, 'src/index.js'),
@@ -54,4 +54,4 @@ module.exports = {
     }),
     new webpack.SourceMapDevToolPlugin('[file].map'),
   ],
-};
+}

@@ -1,7 +1,7 @@
 /* global __dirname:false */
 
-const path = require('path');
-const webpack = require('webpack');
+const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
   entry: ['./demo/index'],
@@ -35,4 +35,4 @@ module.exports = {
       },
     ],
   },
-};
+}

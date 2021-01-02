@@ -1,10 +1,9 @@
-import { Component } from 'react';
-import PropTypes from 'prop-types';
+import { Component } from 'react'
+import PropTypes from 'prop-types'
 
-import Matter, { World, Bodies } from 'matter-js';
+import Matter, { World, Bodies } from 'matter-js'
 
 export default class Body extends Component {
-
   static propTypes = {
     angle: PropTypes.number,
     area: PropTypes.string,
@@ -58,7 +57,7 @@ export default class Body extends Component {
     timeScale: PropTypes.number,
     torque: PropTypes.number,
     vertices: PropTypes.array,
-  };
+  }
 
   static defaultProps = {
     args: [0, 0, 100, 100],
@@ -66,47 +65,46 @@ export default class Body extends Component {
     friction: 1,
     frictionStatic: 0,
     shape: 'rectangle',
-  };
+  }
 
   static contextTypes = {
     engine: PropTypes.object,
-  };
+  }
 
   static childContextTypes = {
     body: PropTypes.object,
-  };
-
-  constructor(props, context) {
-    super(props);
-
-    const { args, children, shape, ...options } = props; // eslint-disable-line no-unused-vars
-
-    this.body = Bodies[shape](...args, options);
-    World.addBody(context.engine.world, this.body);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { args, children, shape, ...options } = nextProps; // eslint-disable-line no-unused-vars
+  constructor(props, context) {
+    super(props)
+
+    const { args, children, shape, ...options } = props // eslint-disable-line no-unused-vars
+
+    this.body = Bodies[shape](...args, options)
+    World.addBody(context.engine.world, this.body)
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { args, children, shape, ...options } = nextProps // eslint-disable-line no-unused-vars
 
     Object.keys(options).forEach((option) => {
       if (option in this.body && this.props[option] !== nextProps[option]) {
-        Matter.Body.set(this.body, option, options[option]);
+        Matter.Body.set(this.body, option, options[option])
       }
-    });
+    })
   }
 
   componentWillUnmount() {
-    World.remove(this.context.engine.world, this.body);
+    World.remove(this.context.engine.world, this.body)
   }
 
   getChildContext() {
     return {
       body: this.body,
-    };
+    }
   }
 
   render() {
-    return this.props.children;
+    return this.props.children
   }
-
 }

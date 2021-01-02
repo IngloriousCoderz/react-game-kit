@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key, max-len */
-import React from 'react';
-import Slide from './slide';
+import React from 'react'
+import Slide from './slide'
 
 export default {
   slides: [
@@ -38,4 +38,4 @@ export default {
       </pre>
     </Slide>,
   ],
-};
+}

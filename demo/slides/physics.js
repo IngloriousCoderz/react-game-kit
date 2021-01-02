@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key, max-len */
-import React from 'react';
+import React from 'react'
 
-import Slide from './slide';
+import Slide from './slide'
 
 export default {
   slides: [
@@ -36,7 +36,10 @@ export default {
       </pre>
     </Slide>,
     <Slide>
-      <h2>When using matter-js physics, it's important to do physics updates after the world has updated.</h2>
+      <h2>
+        When using matter-js physics, it's important to do physics updates after
+        the world has updated.
+      </h2>
     </Slide>,
     <Slide>
       <pre>
@@ -90,4 +93,4 @@ export default {
       </pre>
     </Slide>,
   ],
-};
+}

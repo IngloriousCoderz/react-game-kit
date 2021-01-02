@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key, max-len */
-import React from 'react';
+import React from 'react'
 
-import Slide from './slide';
+import Slide from './slide'
 
 export default {
   slides: [
@@ -13,7 +13,9 @@ export default {
       <h1>Should you build a game with React?</h1>
     </Slide>,
     <Slide>
-      <h1>Can <del>Should</del> you build a game with React?</h1>
+      <h1>
+        Can <del>Should</del> you build a game with React?
+      </h1>
     </Slide>,
     <Slide>
       <h1>You sure can!</h1>
@@ -33,17 +35,26 @@ export default {
       <h1>What is a game?</h1>
     </Slide>,
     <Slide>
-      <h2>"A form of play or sport, especially a competitive one played according to rules and decided by skill, strength, or luck."</h2>
+      <h2>
+        "A form of play or sport, especially a competitive one played according
+        to rules and decided by skill, strength, or luck."
+      </h2>
     </Slide>,
     <Slide>
-      <h1>Today we are going to learn how to make a 2d platformer game with ReactJS</h1>
+      <h1>
+        Today we are going to learn how to make a 2d platformer game with
+        ReactJS
+      </h1>
     </Slide>,
     <Slide>
       <h1>Basic Concepts</h1>
     </Slide>,
     <Slide>
       <h2 className="yellow">Game Loop</h2>
-      <p>A programmatic loop that gets input, updates game state and draws the game.</p>
+      <p>
+        A programmatic loop that gets input, updates game state and draws the
+        game.
+      </p>
     </Slide>,
     <Slide>
       <h2 className="yellow">Tick</h2>
@@ -59,11 +70,17 @@ export default {
     </Slide>,
     <Slide>
       <h2 className="yellow">Sprite</h2>
-      <p>An often animated bitmap graphic derived from a larger tiled image of states and steps.</p>
+      <p>
+        An often animated bitmap graphic derived from a larger tiled image of
+        states and steps.
+      </p>
     </Slide>,
     <Slide>
       <h2 className="yellow">TileMap</h2>
-      <p>A large graphic created by rendering a matrix of position indexes derived from a smaller set of common tiles.</p>
+      <p>
+        A large graphic created by rendering a matrix of position indexes
+        derived from a smaller set of common tiles.
+      </p>
     </Slide>,
     <Slide>
       <h2 className="yellow">Physics Engine</h2>
@@ -71,11 +88,16 @@ export default {
     </Slide>,
     <Slide>
       <h2 className="yellow">Rigid Body Physics Engine</h2>
-      <p>A physics engine that assumes that physical bodies are not elastic or fluid.</p>
+      <p>
+        A physics engine that assumes that physical bodies are not elastic or
+        fluid.
+      </p>
     </Slide>,
     <Slide>
       <h2 className="yellow">Physics World</h2>
-      <p>A class that provides a set of conditions that the simulation abides by.</p>
+      <p>
+        A class that provides a set of conditions that the simulation abides by.
+      </p>
     </Slide>,
     <Slide>
       <h2 className="yellow">Physics Body</h2>
@@ -91,7 +113,8 @@ export default {
     </Slide>,
     <Slide>
       <h2>
-        A collection of ReactJS components and utilities that help you make awesome games.
+        A collection of ReactJS components and utilities that help you make
+        awesome games.
       </h2>
     </Slide>,
     <Slide>
@@ -100,9 +123,7 @@ export default {
       </h2>
     </Slide>,
     <Slide>
-      <h2>
-        Oh, and it works on React Native too!
-      </h2>
+      <h2>Oh, and it works on React Native too!</h2>
     </Slide>,
   ],
-};
+}

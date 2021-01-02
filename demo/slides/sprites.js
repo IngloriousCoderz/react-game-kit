@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key, max-len */
-import React from 'react';
+import React from 'react'
 
-import Slide from './slide';
+import Slide from './slide'
 
 export default {
   slides: [
@@ -10,17 +10,29 @@ export default {
     </Slide>,
     <Slide>
       <div style={{ background: 'white', width: '100%' }}>
-        <img width="100%" style={{ imageRendering: 'pixelated', display: 'block' }} src="assets/character-sprite.png"/>
+        <img
+          width="100%"
+          style={{ imageRendering: 'pixelated', display: 'block' }}
+          src="assets/character-sprite.png"
+        />
       </div>
     </Slide>,
     <Slide>
       <div style={{ background: 'white', width: '100%' }}>
-        <img width="100%" style={{ imageRendering: 'pixelated', display: 'block' }} src="assets/character-sprite-grid.png"/>
+        <img
+          width="100%"
+          style={{ imageRendering: 'pixelated', display: 'block' }}
+          src="assets/character-sprite-grid.png"
+        />
       </div>
     </Slide>,
     <Slide>
       <div style={{ background: 'white', width: '100%' }}>
-        <img width="100%" style={{ imageRendering: 'pixelated', display: 'block' }} src="assets/character-gif.gif"/>
+        <img
+          width="100%"
+          style={{ imageRendering: 'pixelated', display: 'block' }}
+          src="assets/character-gif.gif"
+        />
       </div>
     </Slide>,
     <Slide>
@@ -38,7 +50,9 @@ export default {
       </pre>
     </Slide>,
     <Slide>
-      <h2>react-game-kit provides a Sprite component to simplify this process.</h2>
+      <h2>
+        react-game-kit provides a Sprite component to simplify this process.
+      </h2>
     </Slide>,
     <Slide>
       <pre>
@@ -48,4 +62,4 @@ export default {
       </pre>
     </Slide>,
   ],
-};
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const slideStyles = {
   display: 'flex',
@@ -7,14 +7,12 @@ const slideStyles = {
   justifyContent: 'flex-start',
   maxWidth: '166vh',
   padding: 20,
-};
+}
 
 const Slide = (props) => (
   <div style={slideStyles}>
-    <div style={{ width: '100%' }}>
-      {props.children}
-    </div>
+    <div style={{ width: '100%' }}>{props.children}</div>
   </div>
-);
+)
 
-export default Slide;
+export default Slide

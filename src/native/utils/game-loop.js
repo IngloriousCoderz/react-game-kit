@@ -1,36 +1,36 @@
 export default class GameLoop {
   constructor() {
-    this.subscribers = [];
-    this.loopID = null;
-    this.loop = this.loop.bind(this);
+    this.subscribers = []
+    this.loopID = null
+    this.loop = this.loop.bind(this)
   }
 
   start() {
     if (!this.loopID) {
-      this.loop();
+      this.loop()
     }
   }
 
   stop() {
     if (!this.loopID) {
-      window.cancelAnimationFrame(this.loopID);
-      this.loopID = null;
+      window.cancelAnimationFrame(this.loopID)
+      this.loopID = null
     }
   }
 
   subscribe(callback) {
-    return this.subscribers.push(callback);
+    return this.subscribers.push(callback)
   }
 
   unsubscribe(id) {
-    delete this.subscribers[id - 1];
+    delete this.subscribers[id - 1]
   }
 
   loop() {
     this.subscribers.forEach((callback) => {
-      callback.call();
-    });
+      callback.call()
+    })
 
-    this.loopID = window.requestAnimationFrame(this.loop);
+    this.loopID = window.requestAnimationFrame(this.loop)
   }
 }

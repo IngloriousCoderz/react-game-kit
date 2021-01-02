@@ -1,21 +1,20 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions } from 'react-native'
 
 export default class Stage extends Component {
-
   static propTypes = {
     children: PropTypes.any,
     height: PropTypes.number,
     style: PropTypes.object,
     width: PropTypes.number,
-  };
+  }
 
   static defaultProps = {
     width: 1024,
     height: 576,
-  };
+  }
 
   static contextTypes = {
     loop: PropTypes.object,
@@ -24,60 +23,60 @@ export default class Stage extends Component {
   static childContextTypes = {
     loop: PropTypes.object,
     scale: PropTypes.number,
-  };
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
 
-    const { height, width } = Dimensions.get('window');
+    const { height, width } = Dimensions.get('window')
 
     this.state = {
-      dimensions: [height, width ],
-    };
+      dimensions: [height, width],
+    }
   }
 
   getChildContext() {
     return {
       scale: this.getScale().scale,
       loop: this.context.loop,
-    };
+    }
   }
 
   getScale() {
-    const [vheight, vwidth] = this.state.dimensions;
-    const { height, width } = this.props;
+    const [vheight, vwidth] = this.state.dimensions
+    const { height, width } = this.props
 
-    let targetWidth;
-    let targetHeight;
-    let targetScale;
+    let targetWidth
+    let targetHeight
+    let targetScale
 
     if (height / width > vheight / vwidth) {
-      targetHeight = vheight;
-      targetWidth = targetHeight * width / height;
-      targetScale = vheight / height;
+      targetHeight = vheight
+      targetWidth = (targetHeight * width) / height
+      targetScale = vheight / height
     } else {
-      targetWidth = vwidth;
-      targetHeight = targetWidth * height / width;
-      targetScale = vwidth / width;
+      targetWidth = vwidth
+      targetHeight = (targetWidth * height) / width
+      targetScale = vwidth / width
     }
 
     return {
       height: targetHeight,
       width: targetWidth,
       scale: targetScale,
-    };
+    }
   }
 
   getWrapperStyles() {
     return {
       flex: 1,
-    };
+    }
   }
 
   getInnerStyles() {
-    const scale = this.getScale();
-    const xOffset = Math.floor((this.state.dimensions[1] - scale.width) / 2);
-    const yOffset = Math.floor((this.state.dimensions[0] - scale.height) / 2);
+    const scale = this.getScale()
+    const xOffset = Math.floor((this.state.dimensions[1] - scale.width) / 2)
+    const yOffset = Math.floor((this.state.dimensions[0] - scale.height) / 2)
 
     return {
       height: Math.floor(scale.height),
@@ -86,7 +85,7 @@ export default class Stage extends Component {
       overflow: 'hidden',
       left: xOffset,
       top: yOffset,
-    };
+    }
   }
 
   render() {
@@ -96,7 +95,6 @@ export default class Stage extends Component {
           {this.props.children}
         </View>
       </View>
-    );
+    )
   }
-
 }

@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 export default class Sprite extends Component {
-
   static propTypes = {
     offset: PropTypes.array,
     onPlayStateChanged: PropTypes.func,
@@ -15,7 +14,7 @@ export default class Sprite extends Component {
     ticksPerFrame: PropTypes.number,
     tileHeight: PropTypes.number,
     tileWidth: PropTypes.number,
-  };
+  }
 
   static defaultProps = {
     offset: [0, 0],
@@ -27,88 +26,90 @@ export default class Sprite extends Component {
     ticksPerFrame: 4,
     tileHeight: 64,
     tileWidth: 64,
-  };
+  }
 
   static contextTypes = {
     loop: PropTypes.object,
     scale: PropTypes.number,
-  };
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
 
-    this.loopID = null;
-    this.tickCount = 0;
-    this.finished = false;
+    this.loopID = null
+    this.tickCount = 0
+    this.finished = false
 
     this.state = {
       currentStep: 0,
-    };
+    }
   }
 
   componentDidMount() {
-    this.props.onPlayStateChanged(1);
-    const animate = this.animate.bind(this, this.props);
-    this.loopID = this.context.loop.subscribe(animate);
+    this.props.onPlayStateChanged(1)
+    const animate = this.animate.bind(this, this.props)
+    this.loopID = this.context.loop.subscribe(animate)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.state !== this.props.state) {
-      this.finished = false;
-      this.props.onPlayStateChanged(1);
-      this.context.loop.unsubscribe(this.loopID);
-      this.tickCount = 0;
+      this.finished = false
+      this.props.onPlayStateChanged(1)
+      this.context.loop.unsubscribe(this.loopID)
+      this.tickCount = 0
 
-      this.setState({
-        currentStep: 0,
-      }, () => {
-        const animate = this.animate.bind(this, nextProps);
-        this.loopID = this.context.loop.subscribe(animate);
-      });
+      this.setState(
+        {
+          currentStep: 0,
+        },
+        () => {
+          const animate = this.animate.bind(this, nextProps)
+          this.loopID = this.context.loop.subscribe(animate)
+        }
+      )
     }
   }
 
   componentWillUnmount() {
-    this.context.loop.unsubscribe(this.loopID);
+    this.context.loop.unsubscribe(this.loopID)
   }
 
   animate(props) {
-    const { repeat, ticksPerFrame, state, steps } = props;
+    const { repeat, ticksPerFrame, state, steps } = props
 
     if (this.tickCount === ticksPerFrame && !this.finished) {
       if (steps[state] !== 0) {
-        const { currentStep } = this.state;
-        const lastStep = steps[state];
-        const nextStep = currentStep === lastStep ? 0 : currentStep + 1;
+        const { currentStep } = this.state
+        const lastStep = steps[state]
+        const nextStep = currentStep === lastStep ? 0 : currentStep + 1
 
         this.setState({
           currentStep: nextStep,
-        });
+        })
 
         if (currentStep === lastStep && repeat === false) {
-          this.finished = true;
-          this.props.onPlayStateChanged(0);
+          this.finished = true
+          this.props.onPlayStateChanged(0)
         }
       }
 
-      this.tickCount = 0;
+      this.tickCount = 0
     } else {
-      this.tickCount++;
+      this.tickCount++
     }
-
   }
 
   getImageStyles() {
-    const { currentStep } = this.state;
-    const { state, tileWidth, tileHeight } = this.props;
+    const { currentStep } = this.state
+    const { state, tileWidth, tileHeight } = this.props
 
-    const left = this.props.offset[0] + (currentStep * tileWidth);
-    const top = this.props.offset[1] + (state * tileHeight);
+    const left = this.props.offset[0] + currentStep * tileWidth
+    const top = this.props.offset[1] + state * tileHeight
 
     return {
       position: 'absolute',
       transform: `translate(-${left}px, -${top}px)`,
-    };
+    }
   }
 
   getWrapperStyles() {
@@ -120,18 +121,14 @@ export default class Sprite extends Component {
       transform: `scale(${this.props.scale || this.context.scale})`,
       transformOrigin: 'top left',
       imageRendering: 'pixelated',
-    };
+    }
   }
 
   render() {
     return (
       <div style={{ ...this.getWrapperStyles(), ...this.props.style }}>
-        <img
-          style={this.getImageStyles()}
-          src={this.props.src}
-        />
+        <img style={this.getImageStyles()} src={this.props.src} />
       </div>
-    );
+    )
   }
-
 }

@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key, max-len */
-import React from 'react';
+import React from 'react'
 
-import Slide from './slide';
+import Slide from './slide'
 
 export default {
   slides: [
@@ -12,10 +12,15 @@ export default {
       <h2>transform: scale()</h2>
     </Slide>,
     <Slide>
-      <h2><del>transform: scale()</del></h2>
+      <h2>
+        <del>transform: scale()</del>
+      </h2>
     </Slide>,
     <Slide>
-      <h2>Rounding errors on subpixel floats mean we have to manually round & scale.</h2>
+      <h2>
+        Rounding errors on subpixel floats mean we have to manually round &
+        scale.
+      </h2>
     </Slide>,
     <Slide>
       <h2>react-game-kit provides a Stage component to help with this</h2>
@@ -55,4 +60,4 @@ export default {
       </pre>
     </Slide>,
   ],
-};
+}
