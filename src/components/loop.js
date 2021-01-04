@@ -1,44 +1,33 @@
-import React, { Component } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import GameLoop from '../utils/game-loop'
+import LoopContext from '../contexts/loop'
 
-export default class Loop extends Component {
-  static propTypes = {
-    children: PropTypes.any,
-    style: PropTypes.object,
-  }
+const defaultStyles = {
+  height: '100%',
+  width: '100%',
+}
 
-  static childContextTypes = {
-    loop: PropTypes.object,
-  }
+function Loop({ style, children }) {
+  const loop = useRef(new GameLoop())
 
-  constructor(props) {
-    super(props)
+  useEffect(() => {
+    loop.current.start()
 
-    this.loop = new GameLoop()
-  }
+    return () => loop.current.stop()
+  }, [])
 
-  componentDidMount() {
-    this.loop.start()
-  }
+  return (
+    <LoopContext.Provider value={loop.current}>
+      <div style={{ ...defaultStyles, ...style }}>{children}</div>
+    </LoopContext.Provider>
+  )
+}
 
-  componentWillUnmount() {
-    this.loop.stop()
-  }
+export default Loop
 
-  getChildContext() {
-    return {
-      loop: this.loop,
-    }
-  }
-
-  render() {
-    const defaultStyles = {
-      height: '100%',
-      width: '100%',
-    }
-    const styles = { ...defaultStyles, ...this.props.style }
-    return <div style={styles}>{this.props.children}</div>
-  }
+Loop.propTypes = {
+  style: PropTypes.object,
+  children: PropTypes.any,
 }

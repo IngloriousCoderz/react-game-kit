@@ -1,62 +1,55 @@
-import React, { Component } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+
 import { AudioPlayer } from '../src'
 
-export default class Intro extends Component {
-  static propTypes = {
-    onStart: PropTypes.func,
-  }
+const ENTER_KEY = 13
 
-  constructor(props) {
-    super(props)
+function Intro({ onStart }) {
+  const startNoise = useRef()
+  const animationFrame = useRef()
 
-    this.state = {
-      blink: false,
+  const [blink, setBlink] = useState(false)
+
+  useEffect(() => {
+    startNoise.current = new AudioPlayer('/assets/start.wav')
+
+    addEventListener('keypress', handleKeyPress)
+    animationFrame.current = requestAnimationFrame(startUpdate)
+    const interval = setInterval(toggleBlink, 500)
+
+    return () => {
+      removeEventListener('keypress', handleKeyPress)
+      cancelAnimationFrame(animationFrame.current)
+      clearInterval(interval)
     }
+  }, [])
 
-    this.startUpdate = this.startUpdate.bind(this)
-    this.handleKeyPress = this.handleKeyPress.bind(this)
-  }
-
-  componentDidMount() {
-    this.startNoise = new AudioPlayer('/assets/start.wav')
-    window.addEventListener('keypress', this.handleKeyPress)
-    this.animationFrame = requestAnimationFrame(this.startUpdate)
-    this.interval = setInterval(() => {
-      this.setState({
-        blink: !this.state.blink,
-      })
-    }, 500)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keypress', this.handleKeyPress)
-    cancelAnimationFrame(this.animationFrame)
-    clearInterval(this.interval)
-  }
-
-  render() {
-    return (
-      <div>
-        <img className="intro" src="assets/intro.png" />
-        <p
-          className="start"
-          style={{ display: this.state.blink ? 'block' : 'none' }}
-        >
-          Press Start
-        </p>
-      </div>
-    )
-  }
-
-  startUpdate() {
-    this.animationFrame = requestAnimationFrame(this.startUpdate)
-  }
-
-  handleKeyPress(e) {
-    if (e.keyCode === 13) {
-      this.startNoise.play()
-      this.props.onStart()
+  const handleKeyPress = ({ keyCode }) => {
+    if (keyCode === ENTER_KEY) {
+      startNoise.current.play()
+      onStart()
     }
   }
+
+  const startUpdate = () => {
+    animationFrame.current = requestAnimationFrame(startUpdate)
+  }
+
+  const toggleBlink = () => setBlink((blink) => !blink)
+
+  return (
+    <div>
+      <img className="intro" src="assets/intro.png" />
+      <p className="start" style={{ display: blink ? 'block' : 'none' }}>
+        Press Start
+      </p>
+    </div>
+  )
 }
+
+Intro.propTypes = {
+  onStart: PropTypes.func,
+}
+
+export default Intro

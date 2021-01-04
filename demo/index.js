@@ -1,23 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+
+import StoreProvider from './game/store'
 import Presentation from './presentation'
-import { AppContainer } from 'react-hot-loader'
 
 ReactDOM.render(
-  <AppContainer>
+  <StoreProvider>
     <Presentation />
-  </AppContainer>,
+  </StoreProvider>,
   document.getElementById('root')
 )
-
-if (process.env.NODE_ENV !== 'production') {
-  module.hot.accept('./presentation', () => {
-    const NextPresentation = require('./presentation').default
-    ReactDOM.render(
-      <AppContainer>
-        <NextPresentation />
-      </AppContainer>,
-      document.getElementById('root')
-    )
-  })
-}

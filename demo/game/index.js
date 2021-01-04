@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import Matter from 'matter-js'
 
@@ -8,59 +8,40 @@ import Character from './character'
 import Level from './level'
 import Fade from './fade'
 
-import GameStore from './stores/game-store'
+function Game({ onLeave }) {
+  const [fade, setFade] = useState(true)
 
-export default class Game extends Component {
-  static propTypes = {
-    onLeave: PropTypes.func,
-  }
+  const stopMusic = useRef()
+  const keyListener = useRef(new KeyListener())
+  window.AudioContext = window.AudioContext || window.webkitAudioContext
+  window.context = window.context || new AudioContext()
 
-  componentDidMount() {
-    this.player = new AudioPlayer('/assets/music.wav', () => {
-      this.stopMusic = this.player.play({
+  useEffect(() => {
+    const player = new AudioPlayer('/assets/music.wav', () => {
+      stopMusic.current = player.play({
         loop: true,
         offset: 1,
         volume: 0.35,
       })
     })
 
-    this.setState({
-      fade: false,
-    })
+    setFade(false)
 
-    this.keyListener.subscribe([
-      this.keyListener.LEFT,
-      this.keyListener.RIGHT,
-      this.keyListener.UP,
-      this.keyListener.SPACE,
+    keyListener.current.subscribe([
+      KeyListener.LEFT,
+      KeyListener.RIGHT,
+      KeyListener.UP,
+      KeyListener.SPACE,
       65,
     ])
-  }
 
-  componentWillUnmount() {
-    this.stopMusic()
-    this.keyListener.unsubscribe()
-  }
+    return () => {
+      stopMusic.current()
+      keyListener.current.unsubscribe()
+    }
+  }, [])
 
-  render() {
-    return (
-      <Loop>
-        <Stage style={{ background: '#3a9bdc' }}>
-          <World onInit={this.physicsInit}>
-            <Level store={GameStore} />
-            <Character
-              onEnterBuilding={this.handleEnterBuilding}
-              store={GameStore}
-              keys={this.keyListener}
-            />
-          </World>
-        </Stage>
-        <Fade visible={this.state.fade} />
-      </Loop>
-    )
-  }
-
-  physicsInit(engine) {
+  const initPhysics = (engine) => {
     const ground = Matter.Bodies.rectangle(512 * 3, 448, 1024 * 3, 64, {
       isStatic: true,
     })
@@ -78,25 +59,30 @@ export default class Game extends Component {
     Matter.World.addBody(engine.world, rightWall)
   }
 
-  handleEnterBuilding(index) {
-    this.setState({
-      fade: true,
-    })
-    setTimeout(() => {
-      this.props.onLeave(index)
-    }, 500)
+  const handleEnterBuilding = (index) => {
+    setFade(true)
+    setTimeout(() => onLeave(index), 500)
   }
 
-  constructor(props) {
-    super(props)
+  return (
+    <Loop>
+      <Stage style={{ background: '#3a9bdc' }}>
+        <World onInit={initPhysics}>
+          <Level />
+          <Character
+            onEnterBuilding={handleEnterBuilding}
+            keys={keyListener.current}
+          />
+        </World>
+      </Stage>
 
-    this.state = {
-      fade: true,
-    }
-    this.keyListener = new KeyListener()
-    window.AudioContext = window.AudioContext || window.webkitAudioContext
-    window.context = window.context || new AudioContext()
-
-    this.handleEnterBuilding = this.handleEnterBuilding.bind(this)
-  }
+      <Fade visible={fade} />
+    </Loop>
+  )
 }
+
+Game.propTypes = {
+  onLeave: PropTypes.func,
+}
+
+export default Game

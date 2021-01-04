@@ -1,102 +1,81 @@
-import React, { Component } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
-import Matter, { Engine, Events } from 'matter-js'
+import Matter from 'matter-js'
+import LoopContext from '../contexts/loop'
+import EngineContext from '../contexts/engine'
 
-export default class World extends Component {
-  static propTypes = {
-    children: PropTypes.any,
-    gravity: PropTypes.shape({
-      x: PropTypes.number,
-      y: PropTypes.number,
-      scale: PropTypes.number,
-    }),
-    onCollision: PropTypes.func,
-    onInit: PropTypes.func,
-    onUpdate: PropTypes.func,
-  }
-
-  static defaultProps = {
-    gravity: {
-      x: 0,
-      y: 1,
-      scale: 0.001,
-    },
-    onCollision: () => {},
-    onInit: () => {},
-    onUpdate: () => {},
-  }
-
-  static contextTypes = {
-    scale: PropTypes.number,
-    loop: PropTypes.object,
-  }
-
-  static childContextTypes = {
-    engine: PropTypes.object,
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.loopID = null
-    this.lastTime = null
-
-    const world = Matter.World.create({ gravity: props.gravity })
-
-    this.engine = Engine.create({
-      world,
-    })
-
-    this.loop = this.loop.bind(this)
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { gravity } = nextProps
-
-    if (gravity !== this.props.gravity) {
-      this.engine.world.gravity = gravity
-    }
-  }
-
-  componentDidMount() {
-    this.loopID = this.context.loop.subscribe(this.loop)
-    this.props.onInit(this.engine)
-    Events.on(this.engine, 'afterUpdate', this.props.onUpdate)
-    Events.on(this.engine, 'collisionStart', this.props.onCollision)
-  }
-
-  componentWillUnmount() {
-    this.context.loop.unsubscribe(this.loopID)
-    Events.off(this.engine, 'afterUpdate', this.props.onUpdate)
-    Events.off(this.engine, 'collisionStart', this.props.onCollision)
-  }
-
-  getChildContext() {
-    return {
-      engine: this.engine,
-    }
-  }
-
-  render() {
-    const defaultStyles = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      height: '100%',
-      width: '100%',
-    }
-
-    return <div style={defaultStyles}>{this.props.children}</div>
-  }
-
-  loop() {
-    const currTime = 0.001 * Date.now()
-    Engine.update(
-      this.engine,
-      1000 / 60,
-      this.lastTime ? currTime / this.lastTime : 1
-    )
-    this.lastTime = currTime
-  }
+const defaultStyles = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  height: '100%',
+  width: '100%',
 }
+
+function World({ gravity, onInit, onUpdate, onCollision, children }) {
+  const loop = useContext(LoopContext)
+
+  const world = useRef(Matter.World.create({ gravity }))
+  const engine = useRef(Matter.Engine.create({ world: world.current }))
+  const lastTime = useRef()
+  const loopID = useRef()
+
+  useEffect(() => {
+    loopID.current = loop.subscribe(performLoop)
+    onInit(engine.current)
+    Matter.Events.on(engine.current, 'afterUpdate', onUpdate)
+    Matter.Events.on(engine.current, 'collisionStart', onCollision)
+
+    return () => {
+      loop.unsubscribe(loopID.current)
+      Matter.Events.off(engine.current, 'afterUpdate', onUpdate)
+      Matter.Events.off(engine.current, 'collisionStart', onCollision)
+    }
+  }, [])
+
+  useEffect(() => {
+    engine.current.world.gravity = gravity
+  }, [gravity])
+
+  const performLoop = () => {
+    const currTime = 0.001 * Date.now()
+    Matter.Engine.update(
+      engine.current,
+      1000 / 60,
+      lastTime.current ? currTime / lastTime.current : 1
+    )
+    lastTime.current = currTime
+  }
+
+  return (
+    <EngineContext.Provider value={engine.current}>
+      <div style={defaultStyles}>{children}</div>
+    </EngineContext.Provider>
+  )
+}
+
+World.propTypes = {
+  children: PropTypes.any,
+  gravity: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+    scale: PropTypes.number,
+  }),
+  onCollision: PropTypes.func,
+  onInit: PropTypes.func,
+  onUpdate: PropTypes.func,
+}
+
+World.defaultProps = {
+  gravity: {
+    x: 0,
+    y: 1,
+    scale: 0.001,
+  },
+  onCollision: () => {},
+  onInit: () => {},
+  onUpdate: () => {},
+}
+
+export default World

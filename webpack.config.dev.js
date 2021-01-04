@@ -4,6 +4,7 @@ const path = require('path')
 
 module.exports = {
   entry: ['react-hot-loader/patch', './demo/index'],
+  devtool: 'inline-source-map',
   output: {
     path: __dirname,
     filename: 'bundle.js',

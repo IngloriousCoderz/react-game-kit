@@ -1,48 +1,30 @@
-import React, { Component } from 'react'
+import { hot } from 'react-hot-loader/root'
+import React, { useState } from 'react'
 
 import Intro from './intro'
 import Game from './game'
 import Slides from './slides'
 
-export default class Presentation extends Component {
-  constructor(props) {
-    super(props)
+function Presentation() {
+  const [gameState, setGameState] = useState(0)
+  const [slideIndex, setSlideIndex] = useState(0)
 
-    this.state = {
-      gameState: 0,
-      slideIndex: 0,
-    }
+  const handleStart = () => setGameState(1)
 
-    this.handleStart = this.handleStart.bind(this)
-    this.handleDone = this.handleDone.bind(this)
-    this.handleLeave = this.handleLeave.bind(this)
+  const handleDone = () => setGameState(1)
+
+  const handleLeave = (index) => {
+    setGameState(2)
+    setSlideIndex(index)
   }
 
-  render() {
-    this.gameStates = [
-      <Intro onStart={this.handleStart} />,
-      <Game onLeave={this.handleLeave} />,
-      <Slides onDone={this.handleDone} index={this.state.slideIndex} />,
-    ]
-    return this.gameStates[this.state.gameState]
-  }
+  const gameStates = [
+    <Intro onStart={handleStart} />,
+    <Game onLeave={handleLeave} />,
+    <Slides onDone={handleDone} index={slideIndex} />,
+  ]
 
-  handleStart() {
-    this.setState({
-      gameState: 1,
-    })
-  }
-
-  handleDone() {
-    this.setState({
-      gameState: 1,
-    })
-  }
-
-  handleLeave(index) {
-    this.setState({
-      gameState: 2,
-      slideIndex: index,
-    })
-  }
+  return gameStates[gameState]
 }
+
+export default hot(Presentation)

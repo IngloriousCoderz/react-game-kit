@@ -1,110 +1,77 @@
-import React, { Component } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-export default class Sprite extends Component {
-  static propTypes = {
-    offset: PropTypes.array,
-    onPlayStateChanged: PropTypes.func,
-    repeat: PropTypes.bool,
-    scale: PropTypes.number,
-    src: PropTypes.string,
-    state: PropTypes.number,
-    steps: PropTypes.array,
-    style: PropTypes.object,
-    ticksPerFrame: PropTypes.number,
-    tileHeight: PropTypes.number,
-    tileWidth: PropTypes.number,
-  }
+import LoopContext from '../contexts/loop'
 
-  static defaultProps = {
-    offset: [0, 0],
-    onPlayStateChanged: () => {},
-    repeat: true,
-    src: '',
-    state: 0,
-    steps: [],
-    ticksPerFrame: 4,
-    tileHeight: 64,
-    tileWidth: 64,
-  }
+function Sprite(props) {
+  const {
+    offset,
+    onPlayStateChanged,
+    scale,
+    src,
+    state,
+    style,
+    tileHeight,
+    tileWidth,
+  } = props
+  const loop = useContext(LoopContext)
 
-  static contextTypes = {
-    loop: PropTypes.object,
-    scale: PropTypes.number,
-  }
+  const loopID = useRef()
+  const tickCount = useRef(0)
+  const finished = useRef(false)
 
-  constructor(props) {
-    super(props)
+  const [currentStep, setCurrentStep] = useState(0)
 
-    this.loopID = null
-    this.tickCount = 0
-    this.finished = false
+  useEffect(() => {
+    loopID.current = loop.subscribe(animate)
 
-    this.state = {
-      currentStep: 0,
-    }
-  }
+    return () => loop.unsubscribe(loopID.current)
+  }, [])
 
-  componentDidMount() {
-    this.props.onPlayStateChanged(1)
-    const animate = this.animate.bind(this, this.props)
-    this.loopID = this.context.loop.subscribe(animate)
-  }
+  useEffect(() => {
+    loop.unsubscribe(loopID.current)
+    tickCount.current = 0
+    finished.current = false
+    setCurrentStep(0)
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.state !== this.props.state) {
-      this.finished = false
-      this.props.onPlayStateChanged(1)
-      this.context.loop.unsubscribe(this.loopID)
-      this.tickCount = 0
+    loopID.current = loop.subscribe(animate)
+    onPlayStateChanged(true)
+  }, [state])
 
-      this.setState(
-        {
-          currentStep: 0,
-        },
-        () => {
-          const animate = this.animate.bind(this, nextProps)
-          this.loopID = this.context.loop.subscribe(animate)
-        }
-      )
-    }
-  }
-
-  componentWillUnmount() {
-    this.context.loop.unsubscribe(this.loopID)
-  }
-
-  animate(props) {
+  const animate = () => {
     const { repeat, ticksPerFrame, state, steps } = props
-
-    if (this.tickCount === ticksPerFrame && !this.finished) {
+    if (tickCount.current === ticksPerFrame && !finished.current) {
       if (steps[state] !== 0) {
-        const { currentStep } = this.state
         const lastStep = steps[state]
         const nextStep = currentStep === lastStep ? 0 : currentStep + 1
 
-        this.setState({
-          currentStep: nextStep,
-        })
+        setCurrentStep(nextStep)
 
         if (currentStep === lastStep && repeat === false) {
-          this.finished = true
-          this.props.onPlayStateChanged(0)
+          finished.current = true
+          onPlayStateChanged(false)
         }
       }
 
-      this.tickCount = 0
+      tickCount.current = 0
     } else {
-      this.tickCount++
+      tickCount.current++
     }
   }
 
-  getImageStyles() {
-    const { currentStep } = this.state
-    const { state, tileWidth, tileHeight } = this.props
+  const getWrapperStyles = () => ({
+    height: tileHeight,
+    width: tileWidth,
+    overflow: 'hidden',
+    position: 'relative',
+    transform: `scale(${scale})`,
+    transformOrigin: 'top left',
+    imageRendering: 'pixelated',
+  })
 
-    const left = this.props.offset[0] + currentStep * tileWidth
-    const top = this.props.offset[1] + state * tileHeight
+  const getImageStyles = () => {
+    const left = offset[0] + currentStep * tileWidth
+    const top = offset[1] + state * tileHeight
 
     return {
       position: 'absolute',
@@ -112,23 +79,37 @@ export default class Sprite extends Component {
     }
   }
 
-  getWrapperStyles() {
-    return {
-      height: this.props.tileHeight,
-      width: this.props.tileWidth,
-      overflow: 'hidden',
-      position: 'relative',
-      transform: `scale(${this.props.scale || this.context.scale})`,
-      transformOrigin: 'top left',
-      imageRendering: 'pixelated',
-    }
-  }
-
-  render() {
-    return (
-      <div style={{ ...this.getWrapperStyles(), ...this.props.style }}>
-        <img style={this.getImageStyles()} src={this.props.src} />
-      </div>
-    )
-  }
+  return (
+    <div style={{ ...getWrapperStyles(), ...style }}>
+      <img style={getImageStyles()} src={src} />
+    </div>
+  )
 }
+
+Sprite.propTypes = {
+  offset: PropTypes.array,
+  onPlayStateChanged: PropTypes.func,
+  repeat: PropTypes.bool,
+  scale: PropTypes.number,
+  src: PropTypes.string,
+  state: PropTypes.number,
+  steps: PropTypes.array,
+  style: PropTypes.object,
+  ticksPerFrame: PropTypes.number,
+  tileHeight: PropTypes.number,
+  tileWidth: PropTypes.number,
+}
+
+Sprite.defaultProps = {
+  offset: [0, 0],
+  onPlayStateChanged: () => {},
+  repeat: true,
+  src: '',
+  state: 0,
+  steps: [],
+  ticksPerFrame: 4,
+  tileHeight: 64,
+  tileWidth: 64,
+}
+
+export default Sprite

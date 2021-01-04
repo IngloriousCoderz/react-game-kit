@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const Fade = (props) => <div className={`fade ${props.visible && 'active'}`} />
+function Fade({ visible }) {
+  return <div className={`fade ${visible && 'active'}`} />
+}
 
 Fade.propTypes = {
   visible: PropTypes.bool,

@@ -1,171 +1,148 @@
-import React, { Component } from 'react'
+import React, { Component, useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { autorun } from 'mobx'
 
 import { TileMap } from '../../src'
 
-import GameStore from './stores/game-store'
+import ScaleContext from '../../src/contexts/scale'
+import StoreContext from './store/contexts/store'
+import { getStageX } from './store/reducers'
 
-export default class Level extends Component {
-  static contextTypes = {
-    scale: PropTypes.number,
-  }
+function Level() {
+  const scale = useContext(ScaleContext)
+  const { state } = useContext(StoreContext)
+  const stageX = getStageX(state)
 
-  constructor(props) {
-    super(props)
+  const [internalStageX, setInternalStageX] = useState(0)
 
-    this.state = {
-      stageX: 0,
-    }
-  }
+  useEffect(() => {
+    setInternalStageX(Math.round(stageX * scale))
+  }, [stageX, scale])
 
-  componentDidMount() {
-    this.cameraWatcher = autorun(() => {
-      const targetX = Math.round(GameStore.stageX * this.context.scale)
-      this.setState({
-        stageX: targetX,
-      })
-    })
-  }
+  const getWrapperStyles = () => ({
+    position: 'absolute',
+    transform: `translate(${internalStageX}px, 0px) translateZ(0)`,
+    transformOrigin: 'top left',
+  })
 
-  componentWillReceiveProps(nextProps, nextContext) {
-    const targetX = Math.round(GameStore.stageX * nextContext.scale)
-    this.setState({
-      stageX: targetX,
-    })
-  }
-
-  componentWillUnmount() {
-    this.cameraWatcher()
-  }
-
-  getWrapperStyles() {
-    return {
-      position: 'absolute',
-      transform: `translate(${this.state.stageX}px, 0px) translateZ(0)`,
-      transformOrigin: 'top left',
-    }
-  }
-
-  render() {
-    return (
-      <div style={this.getWrapperStyles()}>
-        <TileMap
-          style={{ top: Math.floor(64 * this.context.scale) }}
-          src="assets/boardwalktile.png"
-          tileSize={128}
-          columns={24}
-          rows={4}
-          layers={[
-            [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-              1,
-            ],
-          ]}
-        />
-        <TileMap
-          style={{ top: Math.floor(-63 * this.context.scale) }}
-          src="assets/buildings.png"
-          rows={1}
-          columns={6}
-          tileSize={512}
-          layers={[[1, 2, 3, 4, 5, 6]]}
-        />
-      </div>
-    )
-  }
+  return (
+    <div style={getWrapperStyles()}>
+      <TileMap
+        style={{ top: Math.floor(64 * scale) }}
+        src="assets/boardwalktile.png"
+        tileSize={128}
+        columns={24}
+        rows={4}
+        layers={[
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+          ],
+        ]}
+      />
+      <TileMap
+        style={{ top: Math.floor(-63 * scale) }}
+        src="assets/buildings.png"
+        rows={1}
+        columns={6}
+        tileSize={512}
+        layers={[[1, 2, 3, 4, 5, 6]]}
+      />
+    </div>
+  )
 }
+
+export default Level

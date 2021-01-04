@@ -1,59 +1,36 @@
-import React, { Component } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import ScaleContext from '../contexts/scale'
 
-export default class Stage extends Component {
-  static propTypes = {
-    children: PropTypes.any,
-    height: PropTypes.number,
-    style: PropTypes.object,
-    width: PropTypes.number,
-  }
+const wrapperStyles = {
+  height: '100%',
+  width: '100%',
+  position: 'relative',
+}
 
-  static defaultProps = {
-    width: 1024,
-    height: 576,
-  }
+function Stage({ width, height, style, children }) {
+  const container = useRef()
 
-  static contextTypes = {
-    loop: PropTypes.object,
-  }
+  const [dimensions, setDimensions] = useState([0, 0])
 
-  static childContextTypes = {
-    loop: PropTypes.object,
-    scale: PropTypes.number,
-  }
+  useEffect(() => {
+    addEventListener('resize', updateDimensions)
+    updateDimensions()
 
-  constructor(props) {
-    super(props)
-
-    this.container = null
-
-    this.state = {
-      dimensions: [0, 0],
+    return () => {
+      removeEventListener('resize', updateDimensions)
     }
+  }, [])
 
-    this.setDimensions = this.setDimensions.bind(this)
+  const updateDimensions = () => {
+    setDimensions([
+      container.current.offsetWidth,
+      container.current.offsetHeight,
+    ])
   }
 
-  componentDidMount() {
-    window.addEventListener('resize', this.setDimensions)
-    this.setDimensions()
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.setDimensions)
-  }
-
-  getChildContext() {
-    return {
-      scale: this.getScale().scale,
-      loop: this.context.loop,
-    }
-  }
-
-  getScale() {
-    const [vwidth, vheight] = this.state.dimensions
-    const { height, width } = this.props
+  const getScale = () => {
+    const [vwidth, vheight] = dimensions
 
     let targetWidth
     let targetHeight
@@ -69,7 +46,7 @@ export default class Stage extends Component {
       targetScale = vwidth / width
     }
 
-    if (!this.container) {
+    if (!container.current) {
       return {
         height,
         width,
@@ -84,18 +61,10 @@ export default class Stage extends Component {
     }
   }
 
-  getWrapperStyles() {
-    return {
-      height: '100%',
-      width: '100%',
-      position: 'relative',
-    }
-  }
-
-  getInnerStyles() {
-    const scale = this.getScale()
-    const xOffset = Math.floor((this.state.dimensions[0] - scale.width) / 2)
-    const yOffset = Math.floor((this.state.dimensions[1] - scale.height) / 2)
+  const getInnerStyles = () => {
+    const scale = getScale()
+    const xOffset = Math.floor((dimensions[0] - scale.width) / 2)
+    const yOffset = Math.floor((dimensions[1] - scale.height) / 2)
 
     return {
       height: Math.floor(scale.height),
@@ -106,24 +75,25 @@ export default class Stage extends Component {
     }
   }
 
-  render() {
-    return (
-      <div
-        style={this.getWrapperStyles()}
-        ref={(c) => {
-          this.container = c
-        }}
-      >
-        <div style={{ ...this.getInnerStyles(), ...this.props.style }}>
-          {this.props.children}
-        </div>
+  return (
+    <ScaleContext.Provider value={getScale().scale}>
+      <div style={wrapperStyles} ref={container}>
+        <div style={{ ...getInnerStyles(), ...style }}>{children}</div>
       </div>
-    )
-  }
-
-  setDimensions() {
-    this.setState({
-      dimensions: [this.container.offsetWidth, this.container.offsetHeight],
-    })
-  }
+    </ScaleContext.Provider>
+  )
 }
+
+Stage.propTypes = {
+  children: PropTypes.any,
+  height: PropTypes.number,
+  style: PropTypes.object,
+  width: PropTypes.number,
+}
+
+Stage.defaultProps = {
+  width: 1024,
+  height: 576,
+}
+
+export default Stage
