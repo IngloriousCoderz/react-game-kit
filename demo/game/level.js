@@ -6,13 +6,14 @@ import { TileMap } from '../../src'
 import ScaleContext from '../../src/contexts/scale'
 import StoreContext from './store/contexts/store'
 import { getStageX } from './store/reducers'
+import { BOARDWALK_HEIGHT, BUILDING_HEIGHT } from './store/constants/sizes'
 
 function Level() {
   const scale = useContext(ScaleContext)
   const { state } = useContext(StoreContext)
   const stageX = getStageX(state)
 
-  const [internalStageX, setInternalStageX] = useState(0)
+  const [internalStageX, setInternalStageX] = useState(stageX)
 
   useEffect(() => {
     setInternalStageX(Math.round(stageX * scale))
@@ -29,7 +30,7 @@ function Level() {
       <TileMap
         style={{ top: Math.floor(64 * scale) }}
         src="assets/boardwalktile.png"
-        tileSize={128}
+        tileSize={BOARDWALK_HEIGHT}
         columns={24}
         rows={4}
         layers={[
@@ -134,11 +135,11 @@ function Level() {
         ]}
       />
       <TileMap
-        style={{ top: Math.floor(-63 * scale) }}
+        style={{ top: Math.ceil(-64 * scale) }}
         src="assets/buildings.png"
         rows={1}
         columns={6}
-        tileSize={512}
+        tileSize={BUILDING_HEIGHT}
         layers={[[1, 2, 3, 4, 5, 6]]}
       />
     </div>

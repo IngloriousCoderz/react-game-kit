@@ -6,7 +6,7 @@ import Matter from 'matter-js'
 import EngineContext from '../contexts/engine'
 import { usePrevious } from '../hooks/usePrevious'
 
-const Body = function Body({ args, children, shape, onUpdate, ...options }) {
+function Body({ args, children, shape, onUpdate, ...options }) {
   const engine = useContext(EngineContext)
 
   const body = useRef(Matter.Bodies[shape](...args, options))

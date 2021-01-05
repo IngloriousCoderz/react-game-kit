@@ -7,55 +7,55 @@ function Sprite(props) {
   const {
     offset,
     onPlayStateChanged,
+    repeat,
     scale,
     src,
     state,
+    steps,
     style,
+    ticksPerFrame,
     tileHeight,
     tileWidth,
   } = props
   const loop = useContext(LoopContext)
 
   const loopID = useRef()
-  const tickCount = useRef(0)
+  const tick = useRef(0)
   const finished = useRef(false)
 
   const [currentStep, setCurrentStep] = useState(0)
 
   useEffect(() => {
+    reset()
+    onPlayStateChanged(true)
     loopID.current = loop.subscribe(animate)
 
     return () => loop.unsubscribe(loopID.current)
-  }, [])
-
-  useEffect(() => {
-    loop.unsubscribe(loopID.current)
-    tickCount.current = 0
-    finished.current = false
-    setCurrentStep(0)
-
-    loopID.current = loop.subscribe(animate)
-    onPlayStateChanged(true)
   }, [state])
 
-  const animate = () => {
-    const { repeat, ticksPerFrame, state, steps } = props
-    if (tickCount.current === ticksPerFrame && !finished.current) {
-      if (steps[state] !== 0) {
-        const lastStep = steps[state]
-        const nextStep = currentStep === lastStep ? 0 : currentStep + 1
-
-        setCurrentStep(nextStep)
-
-        if (currentStep === lastStep && repeat === false) {
-          finished.current = true
-          onPlayStateChanged(false)
-        }
+  useEffect(() => {
+    if (currentStep >= steps[state] - 1) {
+      reset()
+      if (!repeat) {
+        finished.current = true
+        onPlayStateChanged(false)
       }
+    }
+  }, [currentStep])
 
-      tickCount.current = 0
-    } else {
-      tickCount.current++
+  const reset = () => {
+    tick.current = 0
+    finished.current = false
+    setCurrentStep(0)
+  }
+
+  const animate = () => {
+    if (!finished.current) {
+      tick.current++
+    }
+    if (tick.current >= ticksPerFrame) {
+      tick.current = 0
+      setCurrentStep((step) => step + 1)
     }
   }
 
@@ -89,8 +89,8 @@ function Sprite(props) {
 Sprite.propTypes = {
   offset: PropTypes.array,
   onPlayStateChanged: PropTypes.func,
-  repeat: PropTypes.bool,
   scale: PropTypes.number,
+  repeat: PropTypes.bool,
   src: PropTypes.string,
   state: PropTypes.number,
   steps: PropTypes.array,
